@@ -1,0 +1,120 @@
+name: mc-network
+
+x-luckperms-env: &luckperms-env
+  REPLACE_ENV_VARIABLES: "TRUE"
+  CFG_STORAGE_METHOD: "mariadb"
+  CFG_DATA_ADDRESS: "db:3306"
+  CFG_DATA_DATABASE: "${MYSQL_DATABASE}"
+  CFG_DATA_USERNAME: "${MYSQL_USER}"
+  CFG_DATA_PASSWORD: "${MYSQL_PASSWORD}"
+
+x-coreprotect-env: &coreprotect-env
+  CFG_MYSQL_SERVER: "db"
+  CFG_MYSQL_PORT: "3306"
+  CFG_MYSQL_DATABASE: "${MYSQL_DATABASE}"
+  CFG_MYSQL_PREFIX: "co_"
+  CFG_MYSQL_USER: "${MYSQL_USER}"
+  CFG_MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+  CFG_DATABASE_LOCK: "false"
+
+services:
+  # ==========================================
+  # DATABASE (MySQL / MariaDB)
+  # ==========================================
+  db:
+    image: mariadb:11
+    container_name: mc-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      MARIADB_AUTO_UPGRADE: "1"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - mc-net
+
+  # ==========================================
+  # VELOCITY PROXY
+  # ==========================================
+  proxy:
+    image: itzg/mc-proxy
+    container_name: mc-velocity
+    restart: unless-stopped
+    ports:
+      # Minecraft Client Port
+      - "25565:25577"
+      - "24454:24454/udp"
+    environment:
+      TYPE: "VELOCITY"
+      EULA: "TRUE"
+      VERSION: "1.21.10"
+      MEMORY: "2G"
+      MINECRAFT_VERSION: "1.21.10"
+      MODRINTH_PROJECTS: "luckperms, velocity:simple-voice-chat:alpha,velocity:tab-was-taken"
+      <<: *luckperms-env
+      REPLACE_ENV_VARIABLES: "TRUE"
+      REPLACE_ENV_IN_FILES: "plugins/luckperms/config.yml"
+    volumes:
+      - ./data/proxy:/server
+    networks:
+      - mc-net
+
+  # ==========================================
+  # PURPUR SERVER 1: LOBBY
+  # ==========================================
+  purpur-survival:
+    image: itzg/minecraft-server
+    container_name: mc-survival
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: "PURPUR"
+      VERSION: "1.21.10"
+      MEMORY: "4G"
+      USE_AIKAR_FLAGS: "TRUE"
+      ONLINE_MODE: "FALSE"
+      MODRINTH_PROJECTS: "paper:luckperms,paper:coreprotect,paper:simple-voice-chat,paper:chunky,paper:worldedit,paper:worldguard,paper:tab-bridge,paper:viewdistancetweaks"
+      PLUGINS: "https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsX-2.22.0.jar,https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsXChat-2.22.0.jar,https://github.com/PlaceholderAPI/PlaceholderAPI/releases/download/2.12.3/PlaceholderAPI-2.12.3.jar,https://github.com/alexdev03/UnlimitedNametags/releases/download/2.0.1/UnlimitedNametags.jar,https://github.com/retrooper/packetevents/releases/download/v2.14.0/packetevents-spigot-2.14.0.jar"
+      <<: [*luckperms-env, *coreprotect-env]
+      CFG_MYSQL_PREFIX: "co_survival_"
+      REPLACE_ENV_VARIABLES: "TRUE"
+      REPLACE_ENV_IN_FILES: "plugins/LuckPerms/config.yml,plugins/CoreProtect/config.yml"
+    volumes:
+      - ./data/survival:/data
+    networks:
+      - mc-net
+
+  # ==========================================
+  # PURPUR SERVER 2: SURVIVAL
+  # ==========================================
+  purpur-survival-2:
+    image: itzg/minecraft-server
+    container_name: mc-survival-2
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: "PURPUR"
+      VERSION: "1.21.10"
+      MEMORY: "4G"
+      USE_AIKAR_FLAGS: "TRUE"
+      ONLINE_MODE: "FALSE"
+      MODRINTH_PROJECTS: "paper:luckperms,paper:coreprotect,paper:simple-voice-chat,paper:chunky,paper:worldedit,paper:worldguard,paper:tab-bridge,paper:viewdistancetweaks"
+      PLUGINS: "https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsX-2.22.0.jar,https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsXChat-2.22.0.jar,https://github.com/PlaceholderAPI/PlaceholderAPI/releases/download/2.12.3/PlaceholderAPI-2.12.3.jar,https://github.com/alexdev03/UnlimitedNametags/releases/download/2.0.1/UnlimitedNametags.jar,https://github.com/retrooper/packetevents/releases/download/v2.14.0/packetevents-spigot-2.14.0.jar"
+      <<: [*luckperms-env, *coreprotect-env]
+      CFG_MYSQL_PREFIX: "co_survival2_"
+      REPLACE_ENV_VARIABLES: "TRUE"
+      REPLACE_ENV_IN_FILES: "plugins/LuckPerms/config.yml,plugins/CoreProtect/config.yml"
+    volumes:
+      - ./data/survival-2:/data
+    networks:
+      - mc-net
+
+volumes:
+  db-data:
+
+networks:
+  mc-net:
+    driver: bridge

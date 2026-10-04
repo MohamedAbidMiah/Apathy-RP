@@ -1,0 +1,766 @@
+# ============================================================
+#   ViewDistanceTweaks - LucasTHCR Edition
+#   Compatible with Paper 1.21.* - 26.*+
+# ============================================================
+
+# Plugin version - DO NOT CHANGE
+version: 3
+
+# Master switch. The plugin manages sim/view distance out of the box with the
+# defaults below; set this to false if you want to configure everything first
+# (or use /vdt disable in-game).
+enabled: true
+
+# ============================================================
+#   UPDATES
+# ============================================================
+# Tell you when a newer release exists? One async request on startup, it never
+# blocks the server, and nothing is downloaded. Turn it off if the machine has
+# no outbound internet access. /vdt update always checks on demand regardless.
+# (This was called update-checker before 2.8.3; the old name still works.)
+update-notify: true
+
+# Installs new releases on its own. OFF by default, you decide each update.
+# Set enabled to true if you would rather not think about it again.
+#
+# This only ever touches ViewDistanceTweaks. No other plugin is looked at, let
+# alone replaced: the only file it can write is named after this plugin's own
+# jar.
+#
+# The running jar is never modified. The download goes into Bukkit's update
+# folder (plugins/update/ by default, see update-folder in bukkit.yml) and the
+# server installs it on the next START. So: downloaded now, active after your
+# next restart. No plugin can safely swap its own jar underneath a running
+# server, and this one does not pretend otherwise.
+#
+# Before anything is written, the download is verified against the SHA-512 hash
+# Modrinth publishes for that file. On a mismatch it is discarded, not installed.
+#
+# Needs update-notify above to stay true, since this acts on its result.
+# You can always fetch an update on demand with /vdt update download, whatever
+# this is set to.
+auto-update:
+  enabled: false
+
+  # Only accept releases that list the Minecraft version this server runs.
+  # Leaving this true is strongly recommended. false lets the plugin install a
+  # build that was never tested against your server version.
+  require-matching-game-version: true
+
+  # Which Modrinth release channels may be installed: release, beta, alpha.
+  # Add "beta" if you want fixes early and accept the risk that comes with it.
+  accepted-release-types:
+    - release
+
+# ============================================================
+#   IDLE PRE-GENERATION (optional, off by default)
+# ============================================================
+# Builds terrain ahead of time, so players never wait for it. Generating a chunk
+# is the most expensive thing a server does and the one this plugin can otherwise
+# only react to. Terrain that already exists is read from disk instead, which is
+# cheap, and the chunk-generation safeguard never has to trip at all.
+#
+# Three rules keep it from becoming the problem it is meant to solve:
+#   * It throttles against the same rolling MSPT average the distance engine uses,
+#     not an instant reading, so the two never disagree about whether the server
+#     is busy.
+#   * It STOPS on low memory rather than slowing down. A slower path to an
+#     OutOfMemoryError is still an OutOfMemoryError.
+#   * It writes progress to disk, so a crash or a nightly reboot resumes exactly
+#     where it left off instead of silently losing hours of work.
+#
+# It also excludes its own chunks from the chunk-generation safeguard. Without
+# that, starting a run would make the plugin think players were outrunning the
+# generator and clamp everyone's view distance.
+idle-pregeneration:
+  enabled: false
+
+  # Start automatically once the last player logs off. Set "world" to the world
+  # you want built out; leave it empty and nothing starts on its own, but
+  # /vdt pregen still works. For a fixed clock time instead of "whenever it's
+  # empty", use /vdt pregen schedule <world> <radius> <HH:mm> - see /vdt pregen.
+  start-when-empty: true
+  world: ""
+  # Radius around the world spawn, in chunks. 250 chunks is a 4000-block radius.
+  # Mind the squaring: the workload is (2*radius+1)^2 chunks, so 250 is about
+  # 251,000 chunks and 1000 is over four million. Match this to your world border
+  # rather than picking a round number.
+  radius: 250
+
+  # Refuses any /vdt pregen start above this, so a mistyped radius cannot queue
+  # a run that would take weeks.
+  max-radius: 5000
+
+  # How many chunk requests may be in flight at once, and how many ticks to wait
+  # between batches. Higher = faster and heavier. The defaults are deliberately
+  # gentle; raise them on a machine with headroom.
+  chunks-per-batch: 4
+  tick-interval: 5
+
+  # Pause while the server is above this MSPT. Well below decrease-mspt-threshold
+  # on purpose: pre-generation is optional work and should yield long before the
+  # distance engine has to start defending TPS.
+  pause-above-mspt: 35.0
+
+  # Stop entirely while free heap is under this percentage. Higher than
+  # memory-safeguard's own floor because mass generation allocates far faster
+  # than a distance increase does.
+  min-free-memory-percent: 30.0
+
+  # Pause an AUTOMATIC run as soon as anyone logs in, and continue when the server
+  # empties again.
+  #
+  # This does not apply to a run started with /vdt pregen: somebody who typed the
+  # command while standing in the world is not asking to be told to log off first.
+  # Manual runs stay throttled by pause-above-mspt and min-free-memory-percent, so
+  # they still cannot run the server into the ground.
+  pause-when-players-online: true
+
+  # Clamp the radius to whatever the world border still allows around the chosen
+  # centre, instead of generating chunks nobody inside the border can reach. Only
+  # matters once a border smaller than the default (60,000,000 blocks) is set;
+  # turn this off if you plan to widen the border later and want the terrain
+  # ready ahead of time.
+  respect-world-border: true
+
+# ============================================================
+#   PREDICTIVE PRE-LOADING (optional, off by default)
+# ============================================================
+# Loads chunks along the path of a fast-moving player, so arriving somewhere does
+# not stall the tick.
+#
+# To be clear about what this is: it makes chunks ready SERVER-side. It does not
+# let anyone see further. The client still receives only what its own view
+# distance covers. The visible result is the absence of a hitch, not a wider
+# horizon.
+#
+# Prediction follows the movement vector, not the look direction. During elytra
+# flight the view swings around constantly while the flight path stays straight,
+# and it is the path that decides which chunks the server will need.
+predictive-preloading:
+  enabled: false
+
+  # Ticks between passes, and the speed a player must sustain to qualify.
+  # 0.8 blocks per tick is roughly sprint speed; elytra flight is far above it.
+  tick-interval: 10
+  min-speed-blocks-per-tick: 0.8
+
+  # How far along the path to look, and the cap on chunk requests per pass across
+  # all players together.
+  lookahead-chunks: 4
+  max-chunks-per-cycle: 8
+
+  # Skip a pass while the server is above this MSPT. Pre-loading is a comfort
+  # feature and must be the first thing to go under pressure.
+  pause-above-mspt: 40.0
+
+  # Mix the look direction into the prediction at half weight. Helps when players
+  # are about to turn, adds noise during sustained travel. Off by default.
+  blend-look-direction: false
+
+  # Allow pre-loading to GENERATE terrain that does not exist yet.
+  # Leave this false. With it on, this stops being a loader and becomes a second,
+  # uncontrolled generator driven by whoever is flying fastest, the exact load
+  # spike the rest of the plugin exists to contain. Use idle-pregeneration for
+  # unexplored terrain instead.
+  allow-generation: false
+
+# ============================================================
+#   ADJUSTMENT
+# ============================================================
+# Adjustment mode:
+#   proactive - Adjusts distances before performance suffers
+#               (based on chunk count targets)
+#   reactive  - Reacts to MSPT changes
+#   mixed     - Combines both; prioritises reduction when overloaded (recommended)
+#   off       - Disables automatic sim/view distance management entirely. Sim/view
+#               distance is left exactly as-is; only /vdt simulationdistance|viewdistance
+#               (temporary overrides) can still change it. Everything else keeps working
+#               independently: idle pre-generation, predictive pre-loading, AFK
+#               throttling, per-player fixed distances, MSPT tracking. Use this if you
+#               only want the pre-generation/pre-loading subsystems and nothing else.
+adjustment-mode: mixed
+
+# How many ticks after plugin start should be waited before the first check runs?
+# 2400 = 2 minutes, useful to let the server stabilise after a restart.
+start-delay: 2400
+
+# How many ticks between checks for whether distances need to be adjusted?
+# 600 = every 30 seconds
+ticks-per-check: 600
+
+# How many consecutive checks must confirm an increase before it is applied?
+#
+# This is the main brake on how fast distances recover. With ticks-per-check at
+# 600 (30s), each confirmation costs half a minute before anything grows, and it
+# resets on any check that is not healthy.
+#
+# 3 confirmations and max-increase-step 2 means roughly +2 chunks every 90
+# seconds, so a world walks 4 -> 16 in about nine minutes of good health.
+# Earlier versions shipped 10 here with a step of 1, which is five minutes per
+# single chunk and an hour for that same climb - safe, but slow enough that
+# admins reasonably thought the plugin had stopped working.
+#
+# Raise it if your MSPT is spiky and you would rather be sure before growing;
+# lower it only if you also trust mspt-prediction and revert-increase to catch
+# a bad decision.
+passed-checks-for-increase: 3
+
+# How many consecutive checks must confirm a decrease?
+# 1 = immediate reaction when overloaded (recommended)
+passed-checks-for-decrease: 1
+
+# Should a line be logged to the console when distances are changed?
+log-changes: true
+
+# Should a message be sent to players with the permission viewdistancetweaks.notify?
+# Useful for admins who want to follow changes live.
+announce-changes-in-chat: false
+
+# Format of the announce message. Placeholders:
+#   {world}   - world name
+#   {oldSim}  - old simulation distance
+#   {newSim}  - new simulation distance
+#   {oldView} - old view distance
+#   {newView} - new view distance
+# Colours with & are supported.
+announce-format: "&7[VDT] &f{world}: Sim &e{oldSim}&7→&a{newSim} &f| View &e{oldView}&7→&a{newView}"
+
+# ============================================================
+#   PROACTIVE MODE
+# ============================================================
+proactive-mode-settings:
+  # Maximum number of ticking chunks globally (across all worlds).
+  # Formula: (2*sim+1)^2 * number of players
+  # Example: 20 players, Sim 8 -> (17)^2 * 20 = 5780
+  global-ticking-chunk-count-target: 5780
+
+  # Maximum number of non-ticking chunks globally (View minus Sim).
+  # Formula: ((2*view+1)^2 - (2*sim+1)^2) * number of players
+  # Example: 20 players, View 12, Sim 8 -> (625 - 289) * 20 = 6720
+  global-non-ticking-chunk-count-target: 6720
+
+  # NEW in 2.6: what a world with ZERO players should be driven to.
+  #   min  - drop it to its configured minimum (recommended, default)
+  #   max  - drive it to its configured maximum (behaviour before 2.6)
+  #   keep - leave whatever it currently has
+  # No chunks tick while a world is empty, so "max" costs nothing right up until
+  # someone walks in, at which point they land on a fully maxed-out world and
+  # max-decrease-step can only walk it back down one notch per check. That is the
+  # exact load spike startup-grace exists to prevent, hence "min" as the default.
+  empty-world-target: min
+
+  # NEW in 2.7: weigh chunks by what is actually IN them instead of counting
+  # them all the same. An ocean chunk costs almost nothing; a chunk holding a
+  # 500-hopper sorting system can dominate a tick on its own, yet the plain
+  # (2*d+1)^2 formula treats both as one unit, so a redstone-heavy world gets
+  # the same budget as a world full of water.
+  #
+  # Inspecting chunks is itself work, so this SAMPLES a bounded number of
+  # loaded chunks per world (round-robin) and derives an average multiplier,
+  # refreshed once per ticks-per-check. It never scans every chunk.
+  use-complexity-weighting: false
+
+  # How many loaded chunks to sample per world per refresh. Higher = more
+  # accurate but more work. 40 is plenty for a stable average.
+  complexity-sample-chunks: 40
+
+  # Base cost of an ordinary chunk before any tile entities are counted.
+  complexity-default-weight: 1.0
+
+  # Surcharge per tile entity of that material. Names are Bukkit Material
+  # names. Anything not listed adds nothing.
+  complexity-weights:
+    HOPPER: 0.5
+    SPAWNER: 2.0
+    CHEST: 0.05
+    TRAPPED_CHEST: 0.05
+    BARREL: 0.05
+    FURNACE: 0.1
+    BLAST_FURNACE: 0.1
+    SMOKER: 0.1
+    BREWING_STAND: 0.1
+    BEACON: 0.5
+    CONDUIT: 0.5
+    PISTON: 0.1
+    STICKY_PISTON: 0.1
+
+# ============================================================
+#   REACTIVE MODE
+# ============================================================
+reactive-mode-settings:
+  # Below which MSPT should an increase of the distance be considered?
+  increase-mspt-threshold: 40.0
+
+  # Above which MSPT should a decrease of the distance be considered?
+  # A tick lasts at most 50ms (= 20 TPS); players notice lag from ~47ms.
+  decrease-mspt-threshold: 47.0
+
+  # If true: when the server is overloaded, simulation distance is reduced FIRST.
+  # View distance is only reduced once simulation distance has already hit its
+  # configured minimum for that world. Simulation distance has a bigger impact
+  # on TPS, while reducing view distance causes visible chunk flicker for
+  # players, so this avoids touching view distance unless it's really needed.
+  # If false: simulation and view distance are reduced together (old behavior).
+  # Default: false
+  prioritize-simulation-distance: false
+
+  # Maximum number of steps simulation/view distance may change by in a single
+  # check cycle, in EACH direction. Setting both to 1 gives the old behaviour of
+  # one chunk at a time.
+  #   max-increase-step - limits how much distance can grow in one check
+  #   max-decrease-step - limits how much distance can shrink in one check
+  #
+  # These are deliberately not the same. Growing is a comfort: two chunks at a
+  # time is quick enough that recovery is visible within minutes, and a step that
+  # turns out to be wrong is undone by revert-increase-if-overloaded on the very
+  # next check. Shrinking is a defence, and four lets it bail out in one move
+  # when the server is genuinely in trouble rather than crawling down while
+  # players sit through it.
+  #
+  # Default: 2 up, 4 down
+  max-increase-step: 2
+  max-decrease-step: 4
+
+  # After increasing simulation/view distance, re-check MSPT shortly after
+  # (see below). If the server is immediately overloaded as a result, the
+  # increase is rolled back on the next check instead of waiting through the
+  # normal passed-checks-for-decrease delay. This prevents the "jump straight
+  # to max, then crawl back down one step at a time" problem.
+  revert-increase-if-overloaded: true
+
+  mspt-tracker-settings:
+    # Over how many ticks is the MSPT average calculated?
+    # 1200 = 1 minute. Higher = more stable but slower to react.
+    collection-period: 1200
+
+    # MSPT prediction: Prevents increasing distances
+    # even though we know from history that this would cause lag.
+    mspt-prediction:
+      enabled: true
+
+      # How many minutes of history should be stored for the prediction?
+      history-length: 30
+
+      # Minimum number of data points before the prediction takes effect.
+      # Prevents wrong decisions immediately after server start.
+      min-samples: 5
+
+    # MSPT VARIANCE: a server can have a perfectly fine *average* MSPT while
+    # still spiking badly tick-to-tick (e.g. redstone clocks, chunk generation
+    # bursts, plugin schedulers). Average-only checks miss this. This tracks
+    # how spread out the recent tick times are (standard deviation) and can
+    # treat a high-variance server as if it were overloaded, even if the
+    # average MSPT is still below decrease-mspt-threshold.
+    mspt-variance:
+      enabled: true
+
+      # How many of the most recent tick samples (from Paper's getTickTimes())
+      # are used to compute the standard deviation. getTickTimes() holds up to
+      # 100 samples (~5s at 20 TPS); this just controls how many of those are used.
+      sample-window: 100
+
+      # Standard deviation (in ms) above which the server is considered
+      # "unstable" and treated as overloaded for decrease purposes, even if
+      # average MSPT is fine. Typical stable servers sit around 1-4ms stddev;
+      # noticeable stutter usually starts around 8-10ms+.
+      variance-threshold: 8.0
+
+      # Minimum number of samples required before variance is evaluated at all.
+      # Prevents false positives right after server start.
+      min-samples: 20
+
+      # If true, high variance ALSO blocks increases (in addition to forcing
+      # decreases), even if average MSPT looks fine. Recommended: true.
+      block-increase-on-high-variance: true
+
+      # Standard deviation is symmetric. It measures how spread out recent ticks
+      # are around the average, regardless of direction. A server bouncing between
+      # 4ms and 18ms (avg ~10ms, still totally fine) can trip the same stddev
+      # threshold as one bouncing between 40ms and 55ms (avg ~47ms, actually
+      # struggling). Variance is only treated as overload once the average MSPT
+      # is at least this high. Below it, variance is ignored even if it exceeds
+      # variance-threshold above.
+      min-avg-mspt-to-trigger: 25.0
+
+# ============================================================
+#   PER-PLAYER FIXED VIEW DISTANCE (optional)
+# ============================================================
+# Lets specific players (e.g. mods, streamers) keep a fixed CLIENT-SIDE view
+# distance regardless of what the plugin sets for the world. This only affects
+# what that individual player receives. It does NOT change the world's
+# server-side view distance or the chunk budget the rest of this plugin manages.
+#
+# Grant a permission "<permission-prefix><value>" to set that player's fixed
+# view distance, e.g. with permission-prefix "viewdistancetweaks.fixed." :
+#   viewdistancetweaks.fixed.20   -> that player always gets view distance 20
+# If a player has multiple such permissions, the highest value is used.
+# Valid values are 2-32; anything higher is clamped to 32. Note that a player
+# never sees more chunks than their own client render-distance setting allows.
+# Taking the permission away again hands the player back to their world's
+# normal, plugin-managed view distance, no relog needed.
+# ---------------------------------------------------------------------------
+# PER-WORLD MSPT
+# ---------------------------------------------------------------------------
+# The server reports one MSPT figure for everything. When a single world is
+# responsible for the load, that one number drags every world down with it and
+# all of them get throttled - including the quiet ones that were not the
+# problem.
+#
+# With this on, the plugin splits the server tick between worlds and judges
+# each world by its own share. The world causing the lag shrinks first; the
+# quiet ones are left alone, or may even keep growing.
+#
+# IMPORTANT: this does NOT change what the thresholds above mean. A world
+# carrying exactly its fair share of the tick is still judged against the same
+# decrease-mspt-threshold as before. Only worlds that pull more (or less) than
+# their share see an adjusted figure, so nothing has to be re-tuned.
+# On a single-world server this feature changes nothing at all.
+per-world-mspt:
+  # Default: false. Turning this on changes which world gets throttled first.
+  enabled: false
+
+  # How many ticks between per-world cost readings. The server tick time itself
+  # is read every tick regardless, so raising this does not make the plugin
+  # slower to notice lag spikes - it only makes the split between worlds
+  # refresh less often. Raise it on servers with very many worlds.
+  # Default: 20 (once per second)
+  sample-interval: 20
+
+  # On Folia, measure region tick times directly instead of estimating from
+  # world contents. Ignored on Paper, which has no per-region timing to read.
+  #
+  # Note what this costs: a measured Folia figure is a region's tick PERIOD, and
+  # every region that is keeping up reports the tick rate itself. So the per-world
+  # split comes out even no matter which world is busy, and there is nothing to
+  # attribute - with this on, per-world MSPT has no effect on Folia until regions
+  # actually fall behind. Set it to false to use the estimating proxy on Folia too,
+  # which is less precise but can tell a busy world from an idle one.
+  # Default: true
+  prefer-exact-source: true
+
+  # How far a world's figure may be scaled away from the server-wide one.
+  # A factor of 1.0 means "this world carries exactly its fair share".
+  #   min - floor, so a quiet world on a struggling server is not told
+  #         everything is fine and allowed to grow without limit
+  #   max - ceiling, so one world briefly holding the whole tick does not get
+  #         slammed to its minimum distance over a momentary spike
+  # Default: 0.5 and 2.0
+  min-attribution-factor: 0.5
+  max-attribution-factor: 2.0
+
+  # Log a line whenever a world is judged by an adjusted figure. Useful when
+  # first turning this on to see what it is actually doing; noisy afterwards.
+  # Default: false
+  log-attribution: false
+
+per-player-fixed-view-distance:
+  # Must be true for the viewdistancetweaks.fixed.<value> permissions to do
+  # anything. Works independently of the "enabled" master switch at the top.
+  enabled: true
+  # Must be lowercase-safe; a trailing "." is added automatically if missing.
+  permission-prefix: "viewdistancetweaks.fixed."
+
+# ============================================================
+#   PER-PLAYER FIXED SIMULATION DISTANCE (optional, NEW in 2.6)
+# ============================================================
+# Exactly the same idea as the fixed view distance above, but for simulation
+# distance (Paper's Player#setSimulationDistance). Simulation distance controls
+# how far around that player the world actually TICKS: mobs, redstone, crops.
+#
+# Careful: unlike view distance this genuinely costs server performance, so
+# handing it out widely will hurt. It is meant for a handful of staff members,
+# not for a donor rank.
+#
+#   viewdistancetweaks.simfixed.8   -> that player always gets simulation distance 8
+#
+# Valid values are 2-32; anything higher is clamped to 32. If a player holds
+# several such permissions, the highest value is used. Taking the permission
+# away hands the player back to their world's normal distance, no relog needed.
+# Use a DIFFERENT permission-prefix than the view-distance feature above,
+# otherwise a single permission would set both values at once.
+per-player-fixed-simulation-distance:
+  enabled: false
+  permission-prefix: "viewdistancetweaks.simfixed."
+
+# ============================================================
+#   AFK PLAYER THROTTLING (optional, NEW in 2.7)
+# ============================================================
+# A player standing still at spawn does not need the same distances as one
+# flying an elytra. When they go AFK their personal distances drop to the
+# values below, and the chunks they free up go straight back into the global
+# budget for players who are actually playing.
+#
+# AFK state comes from Paper's own idle timer. If EssentialsX is installed its
+# AFK state is used instead, so someone who typed /afk counts immediately
+# instead of having to wait out afk-time-minutes.
+#
+# Note: an explicit viewdistancetweaks.fixed.<n> permission WINS over this
+# throttle. If you want staff throttled while AFK too, don't give them that
+# permission.
+afk-player-throttling:
+  enabled: false
+  afk-time-minutes: 5
+  afk-simulation-distance: 4
+  afk-view-distance: 6
+  use-essentials-if-present: true
+
+# ============================================================
+#   PING THROTTLING (optional, NEW in 2.11)
+# ============================================================
+# A player with a bad connection cannot keep up with the chunks their distance
+# already sends them - packets queue, the client falls further behind, and
+# raising anyone else's distance only adds to what that connection has to
+# carry. Reduced personal distances free the budget for players whose
+# connection can actually use it. Same mechanism as afk-player-throttling:
+# personal distances only, applied through Player#setViewDistance /
+# #setSimulationDistance.
+#
+# A single high reading does not trip this. Checks run on the same ~5-second
+# cadence as afk-player-throttling and the fixed-view overrides, and the
+# threshold has to hold for checks-before-throttle of them in a row before
+# anyone is throttled - so the default of 3 is about 15 seconds of sustained
+# bad ping. Recovery is immediate: the next good sample lifts the throttle.
+#
+# If both this and afk-player-throttling apply to the same player, the smaller
+# (more restrictive) distance wins - enabling one never raises what the other
+# already set.
+#
+# Note: an explicit viewdistancetweaks.fixed.<n> permission WINS over this
+# throttle, exactly like afk-player-throttling.
+ping-throttling:
+  enabled: false
+  ping-threshold-ms: 200
+  checks-before-throttle: 3
+  ping-simulation-distance: 4
+  ping-view-distance: 6
+
+# ============================================================
+#   CHUNK GENERATION SAFEGUARD (optional, NEW in 2.7)
+# ============================================================
+# mspt-variance notices the stutter that terrain generation causes, but not the
+# cause. This counts chunks that are genuinely being GENERATED (not merely read
+# from disk) and reacts to the cause directly.
+#
+# Generating a chunk runs the whole terrain pipeline and is what actually
+# freezes the main thread when someone crosses unexplored terrain at speed.
+chunk-generation-safeguard:
+  enabled: false
+
+  # Newly generated chunks per second, per world, above which the safeguard trips.
+  chunks-per-second-threshold: 15
+
+  # Block distance increases while generation is running. Growing view distance
+  # mid-generation feeds the exact thing that is stalling the server and causes
+  # the rubber-banding this is meant to avoid.
+  lock-increase-during-gen: true
+
+  # Additionally clamp view distance to this value while generating.
+  # -1 disables the hard clamp and only uses lock-increase-during-gen above.
+  emergency-view-distance: -1
+
+# ============================================================
+#   DENSITY-BASED SCALING (optional, NEW in 2.7)
+# ============================================================
+# 20 players scattered across a world load 20 separate rings of chunks.
+# 20 players standing around the same community farm load almost the SAME
+# chunks. The proactive formula assumes the first case and therefore starves a
+# clustered world of view distance it could easily afford.
+#
+# When enough players sit within cluster-radius chunks of each other, this
+# grants bonus distance proportional to how much of the world's population is
+# in that cluster.
+# ============================================================
+#   CLIENT VIEW DISTANCE CAP
+# ============================================================
+# Nobody sees further than their own client draws. If the highest client setting
+# in a world is 8, a server view distance of 16 loads, ticks and pays for rings
+# of chunks that are never sent to anyone.
+#
+# With this on, a world's view distance is capped at the largest value its
+# players' clients report, plus the headroom below. Never below that world's
+# min-view-distance, and never applied to an empty world or to players whose
+# client did not report a value.
+#
+# Off by default: it only helps if your players actually run low settings, and
+# on a server where everyone uses 16+ it changes nothing at all.
+client-view-distance-cap:
+  enabled: false
+
+  # Chunks on top of the highest reported setting. 1 means a player who raises
+  # their slider one notch is not left staring at ungenerated terrain until the
+  # next check. 0 caps exactly.
+  headroom-chunks: 1
+
+density-based-scaling:
+  enabled: false
+  # Radius in chunks within which players count as "together"
+  cluster-radius: 8
+  # Minimum players in one cluster before any bonus is granted
+  cluster-player-threshold: 5
+  # Maximum bonus distance, reached when everybody is in the same cluster
+  max-bonus: 4
+
+# ============================================================
+#   EMERGENCY RELIEF (optional, NEW in 2.7)
+# ============================================================
+# Last resort. When a world already sits at its MINIMUM simulation and view
+# distance and the server is STILL over decrease-mspt-threshold, there is
+# nothing left to take away from distances. Rather than let the server keep
+# sinking, shed two cheaper-to-lose sources of load instead: thunderstorms
+# (extra light and weather updates) and the day/night cycle.
+#
+# Both are restored automatically once MSPT drops below recover-below-mspt,
+# and on plugin disable. The world's ORIGINAL weather and doDaylightCycle
+# setting are remembered, so a world that deliberately had the cycle off
+# keeps it off afterwards.
+emergency-relief:
+  enabled: false
+  clear-weather: true
+  freeze-time: true
+  # Deliberately lower than decrease-mspt-threshold, otherwise relief would
+  # flap on and off around the same value that triggered it.
+  recover-below-mspt: 40.0
+
+# ============================================================
+#   MEMORY SAFEGUARD (NEW in 2.7)
+# ============================================================
+# Distances don't only cost CPU. Every extra ring of chunks stays resident in
+# the heap. A server can sit at a perfect 20ms MSPT and still be one increase
+# away from spending every tick in garbage collection, at which point MSPT
+# reacts far too late to be useful as the only signal.
+#
+# While free heap is below min-free-percent, ALL increases are blocked
+# regardless of MSPT. Decreases always stay allowed.
+#
+# "Free" means free of LIVE data, measured against the -Xmx ceiling. It is the
+# lowest heap usage seen in the last minute, not the usage right now: every
+# collector deliberately lets garbage pile up before reclaiming it, so a single
+# reading says more about where the GC cycle happens to be than about how much
+# memory the server actually needs. Right after a collection, usage IS the live
+# set, and that is what this compares against.
+#
+# FIXED in 2.11.1: the old reading also credited whatever the JVM was still
+# allowed to grow by. Start with -Xms equal to -Xmx - what Aikar's flags and
+# every hosting panel recommend - and the heap is committed up front, that
+# credit is permanently zero, and the reading collapses to raw occupancy. On
+# ZGC that blocked increases outright; on G1 it started once live data passed
+# roughly half the heap. If you lowered min-free-percent to work around it,
+# you can put it back.
+memory-safeguard:
+  enabled: true
+  min-free-percent: 15.0
+
+# ============================================================
+#   PROFILES (optional, NEW in 2.7)
+# ============================================================
+# Named overlays for a handful of tuning values, switchable in-game with
+# /vdt profile <name>, no config editing mid-event. "normal" is always
+# available and means "the values configured above".
+#
+# Supported keys inside a profile:
+#   decrease-mspt-threshold, increase-mspt-threshold,
+#   max-increase-step, max-decrease-step,
+#   passed-checks-for-increase, passed-checks-for-decrease,
+#   global-ticking-chunk-count-target, global-non-ticking-chunk-count-target,
+#   max-view-distance-cap, max-simulation-distance-cap
+#
+# The two *-cap keys are hard caps applied AFTER every other rule, so a cap of
+# 8 genuinely means 8 and cannot be undone by never-reduce-below-players.
+profiles:
+  event-mode:
+    decrease-mspt-threshold: 42.0 # react to load much earlier
+    max-view-distance-cap: 8 # hard ceiling for the duration of the event
+    passed-checks-for-increase: 20 # and be very reluctant to grow again
+
+  night-mode:
+    increase-mspt-threshold: 45.0 # be generous while the server is quiet
+    max-increase-step: 2
+
+# ============================================================
+#   STARTUP GRACE PERIOD (optional)
+# ============================================================
+# If enabled, the plugin forces a low, fixed sim/view distance immediately when
+# the plugin starts (before start-delay/ticks-per-check even apply), instead of
+# whatever distance the world already had (which could be near max after a
+# config change or a manual override, and cause instant overload/crash on a
+# cold-started server). Once duration-ticks has passed, normal proactive/
+# reactive/mixed adjustment takes back over as usual, and max-increase-step
+# still limits how fast it's then allowed to climb back up.
+startup-grace:
+  enabled: false
+  simulation-distance: 4
+  view-distance: 6
+  # 6000 ticks = 5 minutes
+  duration-ticks: 6000
+
+# ============================================================
+#   WORLD SETTINGS
+# ============================================================
+# Any worlds not listed here inherit the "default" settings.
+# You can override each world with its exact name.
+
+world-settings:
+  default:
+    simulation-distance:
+      # Exclude the world completely from management?
+      # Chunks are still counted for global calculations (unless chunk-weight: 0).
+      exclude: false
+      min-simulation-distance: 4
+      max-simulation-distance: 12
+
+    view-distance:
+      exclude: false
+      min-view-distance: 6
+      max-view-distance: 16
+
+    # How much chunk "budget" does this world weigh?
+    # 1.0 = normal. 0.5 = half as heavy (e.g. End, many empty chunks).
+    # 0.0 = world has no influence on global calculations.
+    chunk-weight: 1.0
+
+    # NEW: Override how often THIS world is checked, independent of the global
+    # ticks-per-check above. Leave unset (or <= 0) to inherit the global value.
+    # Useful for a busy overworld that needs quick reactions vs. a quiet, mostly
+    # empty nether/end that doesn't need checking every 30 seconds.
+    # ticks-per-check: 200
+
+    # NEW: Never lower the distance below the current player count in this world.
+    # Useful for small servers with few players.
+    never-reduce-below-players: false
+
+    # NEW: This world gets 50% more chunk budget in proactive calculations.
+    # Useful for the main world on servers with multiple dimensions.
+    priority-world: false
+
+  # Example: Nether world
+  # world_nether:
+  #   simulation-distance:
+  #     min-simulation-distance: 4
+  #     max-simulation-distance: 8
+  #   view-distance:
+  #     min-view-distance: 4
+  #     max-view-distance: 10
+  #   chunk-weight: 0.8
+  #   priority-world: false
+
+  # Example: End world (many empty chunks -> lower weight)
+  # world_the_end:
+  #   simulation-distance:
+  #     min-simulation-distance: 4
+  #     max-simulation-distance: 10
+  #   view-distance:
+  #     min-view-distance: 6
+  #     max-view-distance: 14
+  #   chunk-weight: 0.5
+
+  # Example: Main world with priority
+  # world:
+  #   simulation-distance:
+  #     min-simulation-distance: 6
+  #     max-simulation-distance: 12
+  #   view-distance:
+  #     min-view-distance: 8
+  #     max-view-distance: 16
+  #   chunk-weight: 1.0
+  #   priority-world: true
