@@ -69,14 +69,12 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            set -e
+
             cd /home/opc/mircs
 
-            git pull origin main
-
-            echo "MYSQL_DATABASE=$MYSQL_DATABASE" >> .env
-            echo "MYSQL_USER=$MYSQL_USER" >> .env
-            echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" >> .env
-            echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
+            git fetch origin main
+            git reset --hard origin/main
 
             mkdir -p data/survival/plugins
             mkdir -p data/survival-2/plugins
@@ -86,4 +84,5 @@ jobs:
             rsync -av --include='plugins/' --include='plugins/**' --exclude='*' configs/survival/ data/survival-2/
             rsync -av --include='plugins/' --include='plugins/**' --exclude='*' configs/proxy/ data/proxy/
 
+            docker compose down
             docker compose up -d --force-recreate
