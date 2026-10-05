@@ -53,7 +53,7 @@ services:
       VERSION: "1.21.10"
       MEMORY: "2G"
       MINECRAFT_VERSION: "1.21.10"
-      MODRINTH_PROJECTS: "luckperms, velocity:simple-voice-chat:alpha,velocity:tab-was-taken"
+      MODRINTH_PROJECTS: "luckperms, velocity:simple-voice-chat:alpha,velocity:tab-was-taken,velocity:skinsrestorer"
       <<: *luckperms-env
       REPLACE_ENV_VARIABLES: "TRUE"
       REPLACE_ENV_IN_FILES: "plugins/luckperms/config.yml"
@@ -76,7 +76,7 @@ services:
       MEMORY: "4G"
       USE_AIKAR_FLAGS: "TRUE"
       ONLINE_MODE: "FALSE"
-      MODRINTH_PROJECTS: "paper:luckperms,paper:coreprotect,paper:simple-voice-chat,paper:chunky,paper:worldedit,paper:worldguard,paper:tab-bridge,paper:viewdistancetweaks"
+      MODRINTH_PROJECTS: "paper:luckperms,paper:coreprotect,paper:simple-voice-chat,paper:chunky,paper:worldedit,paper:worldguard,paper:tab-bridge,paper:viewdistancetweaks,paper:skinsrestorer"
       PLUGINS: "https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsX-2.22.0.jar,https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsXChat-2.22.0.jar,https://github.com/PlaceholderAPI/PlaceholderAPI/releases/download/2.12.3/PlaceholderAPI-2.12.3.jar,https://github.com/alexdev03/UnlimitedNametags/releases/download/2.0.1/UnlimitedNametags.jar,https://github.com/retrooper/packetevents/releases/download/v2.14.0/packetevents-spigot-2.14.0.jar"
       <<: [*luckperms-env, *coreprotect-env]
       CFG_MYSQL_PREFIX: "co_survival_"
@@ -101,7 +101,7 @@ services:
       MEMORY: "4G"
       USE_AIKAR_FLAGS: "TRUE"
       ONLINE_MODE: "FALSE"
-      MODRINTH_PROJECTS: "paper:luckperms,paper:coreprotect,paper:simple-voice-chat,paper:chunky,paper:worldedit,paper:worldguard,paper:tab-bridge,paper:viewdistancetweaks"
+      MODRINTH_PROJECTS: "paper:luckperms,paper:coreprotect,paper:simple-voice-chat,paper:chunky,paper:worldedit,paper:worldguard,paper:tab-bridge,paper:viewdistancetweaks,paper:skinsrestorer"
       PLUGINS: "https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsX-2.22.0.jar,https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsXChat-2.22.0.jar,https://github.com/PlaceholderAPI/PlaceholderAPI/releases/download/2.12.3/PlaceholderAPI-2.12.3.jar,https://github.com/alexdev03/UnlimitedNametags/releases/download/2.0.1/UnlimitedNametags.jar,https://github.com/retrooper/packetevents/releases/download/v2.14.0/packetevents-spigot-2.14.0.jar"
       <<: [*luckperms-env, *coreprotect-env]
       CFG_MYSQL_PREFIX: "co_survival2_"
