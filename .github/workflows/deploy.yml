@@ -54,6 +54,8 @@ jobs:
           docker compose down
 
   deploy:
+    needs: test
+
     runs-on: ubuntu-latest
 
     steps:
