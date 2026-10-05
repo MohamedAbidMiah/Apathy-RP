@@ -34,17 +34,6 @@ nameTags:
         yOffset: 0.20000000298023224
         when: "%player_health% > 10"
         relationalConditions: false
-      - lines:
-          - text: Healthy Player!
-        background:
-          enabled: false
-          color: "#ffffff"
-          opacity: 255
-          shadowed: false
-          seeThrough: false
-        scale: 1.0
-        yOffset: 1.2000000476837158
-        relationalConditions: false
 # Reusable glow animation presets. Reference from displayGroups via glow.type: reference.
 # Built-in ids: rainbow, gradient, gold_pulse (custom handler registered by the plugin).
 glowAnimations:
@@ -79,7 +68,7 @@ behavior:
   # Global vertical offset (blocks) added to all nametags.
   yOffset: 0.30000001192092896
   # Divided by 160 and sent to clients as the display entity view_range (vanilla default = 1.0).
-  # ~blocks ≈ (viewDistance/160)*64. e.g. 60 → ~24 blocks, 160 → ~64 blocks.
+  # ~blocks â‰ˆ (viewDistance/160)*64. e.g. 60 â†’ ~24 blocks, 160 â†’ ~64 blocks.
   viewDistance: 60.0
   # When true, displayGroups are laid out as a compact vertical stack after placeholders are resolved.
   # Empty text groups and inactive groups do not reserve vertical space.
