@@ -35,12 +35,6 @@ services:
       - db-data:/var/lib/mysql
     networks:
       - mc-net
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 10s
 
   # ==========================================
   # VELOCITY PROXY
@@ -49,9 +43,6 @@ services:
     image: itzg/mc-proxy
     container_name: mc-velocity
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     ports:
       # Minecraft Client Port
       - "25565:25577"
@@ -78,9 +69,6 @@ services:
     image: itzg/minecraft-server
     container_name: mc-survival
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       EULA: "TRUE"
       TYPE: "PURPUR"
@@ -106,9 +94,6 @@ services:
     image: itzg/minecraft-server
     container_name: mc-survival-2
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       EULA: "TRUE"
       TYPE: "PURPUR"
