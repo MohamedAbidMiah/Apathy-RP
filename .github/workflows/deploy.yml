@@ -73,7 +73,6 @@ jobs:
             echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" >> .env
             echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
 
-
             mkdir -p data/survival/plugins
             mkdir -p data/survival-2/plugins
             mkdir -p data/proxy/plugins
