@@ -53,7 +53,7 @@ services:
       VERSION: "1.21.10"
       MEMORY: "2G"
       MINECRAFT_VERSION: "1.21.10"
-      MODRINTH_PROJECTS: "luckperms, velocity:simple-voice-chat:alpha,velocity:tab-was-taken,velocity:skinsrestorer"
+      MODRINTH_PROJECTS: "luckperms,velocity:simple-voice-chat:alpha,velocity:tab-was-taken,velocity:skinsrestorer"
       <<: *luckperms-env
       REPLACE_ENV_VARIABLES: "TRUE"
       REPLACE_ENV_IN_FILES: "plugins/luckperms/config.yml"
