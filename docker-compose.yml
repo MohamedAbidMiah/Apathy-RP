@@ -50,9 +50,9 @@ services:
     environment:
       TYPE: "VELOCITY"
       EULA: "TRUE"
-      VERSION: "1.21.10"
+      VERSION: "1.21.11"
       MEMORY: "2G"
-      MINECRAFT_VERSION: "1.21.10"
+      MINECRAFT_VERSION: "1.21.11"
       MODRINTH_PROJECTS: "luckperms,velocity:simple-voice-chat:alpha,velocity:tab-was-taken,velocity:skinsrestorer"
       <<: *luckperms-env
       REPLACE_ENV_VARIABLES: "TRUE"
@@ -72,7 +72,7 @@ services:
     environment:
       EULA: "TRUE"
       TYPE: "PURPUR"
-      VERSION: "1.21.10"
+      VERSION: "1.21.11"
       MEMORY: "4G"
       USE_AIKAR_FLAGS: "TRUE"
       ONLINE_MODE: "FALSE"
@@ -97,7 +97,7 @@ services:
     environment:
       EULA: "TRUE"
       TYPE: "PURPUR"
-      VERSION: "1.21.10"
+      VERSION: "1.21.11"
       MEMORY: "4G"
       USE_AIKAR_FLAGS: "TRUE"
       ONLINE_MODE: "FALSE"
