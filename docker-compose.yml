@@ -101,7 +101,7 @@ services:
       ONLINE_MODE: "FALSE"
       MODRINTH_PROJECTS: *modrinth-projects
       PLUGINS: *plugins
-      SPIGET_RESOURCES: *spiget
+      SPIGET_RESOURCES: *spiget-resources
       <<: [*luckperms-env, *coreprotect-env]
       CFG_MYSQL_PREFIX: "co_survival_"
       REPLACE_ENV_VARIABLES: "TRUE"
