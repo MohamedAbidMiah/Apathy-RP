@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.1.0...v1.2.0) (2026-10-06)
+
+
+### Features
+
+* add axiom plugin ([#23](https://github.com/MohamedAbidMiah/Apathy-RP/issues/23)) ([858d69b](https://github.com/MohamedAbidMiah/Apathy-RP/commit/858d69b3355c4a639daa1be667ff62f2b728ae5e))
+
 ## [1.1.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.0.0...v1.1.0) (2026-10-06)
 
 
