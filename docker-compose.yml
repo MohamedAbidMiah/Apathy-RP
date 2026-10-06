@@ -78,6 +78,7 @@ services:
       ONLINE_MODE: "FALSE"
       MODRINTH_PROJECTS: "paper:luckperms,paper:coreprotect,paper:simple-voice-chat,paper:chunky,paper:worldedit,paper:worldguard,paper:tab-bridge,paper:viewdistancetweaks,paper:skinsrestorer"
       PLUGINS: "https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsX-2.22.0.jar,https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsXChat-2.22.0.jar,https://github.com/PlaceholderAPI/PlaceholderAPI/releases/download/2.12.3/PlaceholderAPI-2.12.3.jar,https://github.com/alexdev03/UnlimitedNametags/releases/download/2.0.1/UnlimitedNametags.jar,https://github.com/retrooper/packetevents/releases/download/v2.14.0/packetevents-spigot-2.14.0.jar,https://ci.citizensnpcs.co/job/Citizens2/4221/artifact/dist/target/Citizens-2.0.43-b4221.jar"
+      SPIGET_RESOURCES: "34315"
       <<: [*luckperms-env, *coreprotect-env]
       CFG_MYSQL_PREFIX: "co_survival_"
       REPLACE_ENV_VARIABLES: "TRUE"
@@ -103,6 +104,7 @@ services:
       ONLINE_MODE: "FALSE"
       MODRINTH_PROJECTS: "paper:luckperms,paper:coreprotect,paper:simple-voice-chat,paper:chunky,paper:worldedit,paper:worldguard,paper:tab-bridge,paper:viewdistancetweaks,paper:skinsrestorer"
       PLUGINS: "https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsX-2.22.0.jar,https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsXChat-2.22.0.jar,https://github.com/PlaceholderAPI/PlaceholderAPI/releases/download/2.12.3/PlaceholderAPI-2.12.3.jar,https://github.com/alexdev03/UnlimitedNametags/releases/download/2.0.1/UnlimitedNametags.jar,https://github.com/retrooper/packetevents/releases/download/v2.14.0/packetevents-spigot-2.14.0.jar,https://ci.citizensnpcs.co/job/Citizens2/4221/artifact/dist/target/Citizens-2.0.43-b4221.jar"
+      SPIGET_RESOURCES: "34315"
       <<: [*luckperms-env, *coreprotect-env]
       CFG_MYSQL_PREFIX: "co_survival2_"
       REPLACE_ENV_VARIABLES: "TRUE"
