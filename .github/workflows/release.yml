@@ -18,4 +18,5 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
+          token: ${{ secrets.GH_TOKEN_FOR_PR }}
           release-type: simple
