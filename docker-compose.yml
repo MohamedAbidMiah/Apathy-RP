@@ -38,7 +38,7 @@ x-modrinth-projects: &modrinth-projects |
   paper:skinsrestorer
   paper:simplenpc
 
-x-spiget: &spiget |
+x-spiget-resources: &spiget-resources |
   34315
 services:
   # ==========================================
@@ -127,7 +127,7 @@ services:
       ONLINE_MODE: "FALSE"
       MODRINTH_PROJECTS: *modrinth-projects
       PLUGINS: *plugins
-      SPIGET_RESOURCES: *spiget
+      SPIGET_RESOURCES: *spiget-resources
       <<: [*luckperms-env, *coreprotect-env]
       CFG_MYSQL_PREFIX: "co_survival2_"
       REPLACE_ENV_VARIABLES: "TRUE"
