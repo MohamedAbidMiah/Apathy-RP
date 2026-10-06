@@ -1,11 +1,28 @@
-name: Apathy SMP
-
+name: CI/CD pipeline
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GH_TOKEN_FOR_PR }}
+          release-type: simple
+
   test:
+    needs: release-please
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -83,3 +100,13 @@ jobs:
 
             docker compose down
             docker compose up -d --force-recreate
+
+  discord-notification:
+    needs: release-please
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Changelog to Discord channel
+        uses: SethCohen/github-releases-to-discord@v1
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
+          color: "16711680"
