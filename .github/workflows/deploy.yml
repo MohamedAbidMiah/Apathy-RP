@@ -1,12 +1,8 @@
 name: Apathy SMP
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 jobs:
   test:
