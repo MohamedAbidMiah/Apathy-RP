@@ -1,6 +1,6 @@
 # Apathy SMP Mircs
 
-This is used to help manage the Apathy smp for mircs. It uses docker to run a multi network server and then deploys it to an oracle server with GitHub actions.
+This is used to help manage the Apathy RP SMP. It uses docker to run a multi network server and then deploys it to an oracle server with GitHub actions.
 
 # For developers
 
@@ -35,22 +35,22 @@ https://www.conventionalcommits.org/en/v1.0.0/
 
 # setup
 
-Once you have cloned repository. run docker compose up -d. After all files are created, go to data/survival/config/paper-global.yml and get secret from data/proxy/forwarding.secret and then paste in secret and enable velocity. Do the same for each backend server.
+Once you have cloned repository. run ```docker compose up -d```. After all files are created, go to data/survival/config/paper-global.yml and get secret from data/proxy/forwarding.secret and then paste in secret and enable velocity. Do the same for each backend server.
 
 ## Example
 
-'''
+```
 velocity:
 enabled: true
 online-mode: true
 secret: 'dsadqwe23eqdwadq1'
-''''
+```
 
 ## To push changes
 
 After that run test.bat or test.bash depending on operating system and run:
 
-'''compose up -d --force-recreate'''
+```compose up -d --force-recreate```
 
 # Warning
 
