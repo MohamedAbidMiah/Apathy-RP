@@ -37,6 +37,7 @@ x-modrinth-projects: &modrinth-projects |
   paper:viewdistancetweaks
   paper:skinsrestorer
   paper:simplenpc
+  paper:axiom-paper-plugin
 
 x-spiget-resources: &spiget-resources |
   34315
