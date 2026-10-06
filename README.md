@@ -35,7 +35,7 @@ https://www.conventionalcommits.org/en/v1.0.0/
 
 # setup
 
-Once you have cloned repository. run ```docker compose up -d```. After all files are created, go to data/survival/config/paper-global.yml and get secret from data/proxy/forwarding.secret and then paste in secret and enable velocity. Do the same for each backend server.
+Once you have cloned repository. run `docker compose up -d`. After all files are created, go to `data/survival/config/paper-global.yml` and get secret from `data/proxy/forwarding.secret` and then paste in secret and enable velocity. Do the same for each backend server.
 
 ## Example
 
@@ -50,7 +50,7 @@ secret: 'dsadqwe23eqdwadq1'
 
 After that run test.bat or test.bash depending on operating system and run:
 
-```compose up -d --force-recreate```
+`compose up -d --force-recreate`
 
 # Warning
 
