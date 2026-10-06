@@ -26,9 +26,10 @@ jobs:
           echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
 
           mkdir -p data/survival/plugins data/survival-2/plugins data/proxy/plugins
-          rsync -av --include='plugins/' --include='plugins/**' --exclude='*' configs/survival/ data/survival/
-          rsync -av --include='plugins/' --include='plugins/**' --exclude='*' configs/survival/ data/survival-2/
-          rsync -av --include='plugins/' --include='plugins/**' --exclude='*' configs/proxy/ data/proxy/
+          rsync -av configs/survival/ data/survival/plugins/
+          rsync -av configs/survival/ data/survival-2/plugins/
+          rsync -av configs/proxy/ data/proxy/plugins/
+          rsync -av configs/proxy-config/ data/proxy/
 
           docker compose config
 
