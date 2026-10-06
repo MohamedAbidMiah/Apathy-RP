@@ -36,10 +36,10 @@ x-modrinth-projects: &modrinth-projects |
   paper:tab-bridge
   paper:viewdistancetweaks
   paper:skinsrestorer
+  paper:simplenpc
 
 x-spiget: &spiget |
   34315
-  100443
 services:
   # ==========================================
   # DATABASE (MySQL / MariaDB)
