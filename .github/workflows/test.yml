@@ -29,9 +29,11 @@ jobs:
           rsync -av configs/proxy-config/ data/proxy/
 
           docker compose config
+
           docker compose up -d
           echo "Waiting 30 seconds for servers and database to boot..."
           sleep 30
+
           docker compose ps
 
           if [ -n "$(docker compose ps --services --filter 'status=exited')" ]; then
