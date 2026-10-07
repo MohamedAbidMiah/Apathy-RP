@@ -78,7 +78,7 @@ services:
       MEMORY: "2G"
       MINECRAFT_VERSION: "1.21.11"
       MODRINTH_PROJECTS: "luckperms,velocity:simple-voice-chat:alpha,velocity:tab-was-taken,velocity:skinsrestorer"
-      <<: *luckperms-env
+      <<: [*luckperms-env, *coreprotect-env]
       REPLACE_ENV_VARIABLES: "TRUE"
       REPLACE_ENV_IN_FILES: "plugins/luckperms/config.yml"
     volumes:
@@ -103,7 +103,7 @@ services:
       MODRINTH_PROJECTS: *modrinth-projects
       PLUGINS: *plugins
       SPIGET_RESOURCES: *spiget-resources
-      <<: [*luckperms-env, *coreprotect-env]
+      <<: [*luckperms-env]
       CFG_MYSQL_PREFIX: "co_survival_"
       REPLACE_ENV_VARIABLES: "TRUE"
       REPLACE_ENV_IN_FILES: "plugins/LuckPerms/config.yml,plugins/CoreProtect/config.yml"
