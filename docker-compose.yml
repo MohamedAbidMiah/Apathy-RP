@@ -140,7 +140,7 @@ services:
 
   world-manager:
     build:
-      context: ../mc-manager
+      context: ${MC_MANAGER_PATH:-../mc-manager}
     container_name: mc-manager
     environment:
       MC_ADMIN_USER: "${MC_ADMIN_USER}"
