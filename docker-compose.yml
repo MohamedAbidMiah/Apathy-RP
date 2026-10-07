@@ -35,7 +35,6 @@ x-modrinth-projects: &modrinth-projects "paper:luckperms,\
   paper:tab-bridge,\
   paper:viewdistancetweaks,\
   paper:skinsrestorer,\
-  paper:simplenpc,\
   paper:axiom-paper-plugin,\
   paper:viabackwards"
 
