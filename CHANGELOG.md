@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.3.0...v1.4.0) (2026-10-07)
+
+
+### Features
+
+* add support for website to manage server  ([7f6c538](https://github.com/MohamedAbidMiah/Apathy-RP/commit/7f6c538eee4681f822146db9dbc86352cc021bdb))
+
 ## [1.3.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.2.0...v1.3.0) (2026-10-07)
 
 
