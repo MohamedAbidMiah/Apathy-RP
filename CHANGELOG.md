@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.4.1...v1.4.2) (2026-10-07)
+
+
+### Bug Fixes
+
+* remove simplenpc due to issues caused by it. ([#32](https://github.com/MohamedAbidMiah/Apathy-RP/issues/32)) ([30c65c8](https://github.com/MohamedAbidMiah/Apathy-RP/commit/30c65c83df3817fd90695e81f789b756e396a4e3))
+
 ## [1.4.1](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.4.0...v1.4.1) (2026-10-07)
 
 
