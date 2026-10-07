@@ -1,4 +1,4 @@
-name: Apathy SMP
+name: deployment
 
 on:
   release:
