@@ -65,7 +65,7 @@ services:
   # ==========================================
   proxy:
     image: itzg/mc-proxy
-    container_name: mc-velocity
+    container_name: mc-proxy
     restart: unless-stopped
     ports:
       # Minecraft Client Port
@@ -137,6 +137,19 @@ services:
       - ./data/survival-2:/data
     networks:
       - mc-net
+
+  world-manager:
+    build:
+      context: ../mc-manager
+    container_name: mc-manager
+    environment:
+      MC_ADMIN_USER: "${MC_ADMIN_USER}"
+      MC_ADMIN_PASSWORD: "${MC_ADMIN_PASSWORD}"
+    ports:
+      - "80:3000"
+    volumes:
+      - ./data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   db-data:
