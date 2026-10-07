@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.4.0...v1.4.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* Deploy fix ([#30](https://github.com/MohamedAbidMiah/Apathy-RP/issues/30)) ([d7d3af6](https://github.com/MohamedAbidMiah/Apathy-RP/commit/d7d3af6b7c3b07d40ae5e87c0eafab9f827640e3))
+
 ## [1.4.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.3.0...v1.4.0) (2026-10-07)
 
 
