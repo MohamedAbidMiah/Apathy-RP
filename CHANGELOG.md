@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.3.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.2.0...v1.3.0) (2026-10-07)
+
+
+### Features
+
+* add backward compatability ([86b4cc9](https://github.com/MohamedAbidMiah/Apathy-RP/commit/86b4cc9cd264831a067fc2fb71b55134aec79fc7))
+
+
+### Bug Fixes
+
+* can now add new plugin in to server and will download it ([86b4cc9](https://github.com/MohamedAbidMiah/Apathy-RP/commit/86b4cc9cd264831a067fc2fb71b55134aec79fc7))
+* have cfg match config ([86b4cc9](https://github.com/MohamedAbidMiah/Apathy-RP/commit/86b4cc9cd264831a067fc2fb71b55134aec79fc7))
+* luckperm should now be able to access database  ([db329bd](https://github.com/MohamedAbidMiah/Apathy-RP/commit/db329bd50631bead7d1726db798e65b4ef77bd38))
+
 ## [1.2.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.1.0...v1.2.0) (2026-10-06)
 
 
