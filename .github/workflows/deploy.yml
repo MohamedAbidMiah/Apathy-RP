@@ -11,6 +11,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Checkout MC Manager
+        uses: actions/checkout@v4
+        with:
+          repository: MohamedAbidMiah/mc-manager
+          path: mc-manager
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -26,6 +32,8 @@ jobs:
           rsync -av configs/survival/ data/survival-2/plugins/
           rsync -av configs/proxy/ data/proxy/plugins/
           rsync -av configs/proxy-config/ data/proxy/
+
+          export MC_MANAGER_PATH=./mc-manager
 
           docker compose config
 
