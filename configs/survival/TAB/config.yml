@@ -21,7 +21,7 @@ header-footer:
         - "&2Ping: %ping%"
         - "&7&l Used memory: %memory-used% MB / %memory-max% MB"
         - ""
-        - "&r&7Visit our discord %animation:web%"
+        - "&r&7Visit our discord &bhttps://discord.gg/mKjbnByadv"
         - "<#FFFFFF>&m                                                </#FFFF00>"
 
 # https://github.com/NEZNAMY/TAB/wiki/Feature-guide:-Tablist-name-formatting
