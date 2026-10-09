@@ -9,7 +9,7 @@ nameTags:
     permission: nametag.staffer
     displayGroups:
       - lines:
-          - text: Staffer %luckperms_prefix% %essentials_nickname% %luckperms_suffix%
+          - text: "%luckperms_prefix% %essentials_nickname% %luckperms_suffix%"
         background:
           enabled: false
           color: 255,0,0
