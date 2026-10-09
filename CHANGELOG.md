@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.4.2...v1.5.0) (2026-10-09)
+
+
+### Features
+
+* add motd to server ([c337baa](https://github.com/MohamedAbidMiah/Apathy-RP/commit/c337baa36b3018c32f4dd2f041b1e676806d25c5))
+* change tab to show server name 'Apathy stranded' and discord invite link ([810cf75](https://github.com/MohamedAbidMiah/Apathy-RP/commit/810cf75d9733db55197ce6422a33663bc56b9c5f))
+
 ## [1.4.2](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.4.1...v1.4.2) (2026-10-07)
 
 
