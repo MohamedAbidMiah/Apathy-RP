@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.6.0...v1.6.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* link for unlimited name tag point to unbroken url now ([#39](https://github.com/MohamedAbidMiah/Apathy-RP/issues/39)) ([4bb50c3](https://github.com/MohamedAbidMiah/Apathy-RP/commit/4bb50c395be8ba9989d2ffc99771d2205987c69b))
+
 ## [1.6.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.5.0...v1.6.0) (2026-10-10)
 
 
