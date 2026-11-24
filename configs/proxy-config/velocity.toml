@@ -48,6 +48,7 @@ enable-player-address-logging = true
 	# represents the IP address of the server to connect to.
 	mc-survival = "mc-survival:25565"
     mc-survival-2 = "mc-survival-2:25565"
+	mc-survival-3 = "mc-survival-3:25565"
 	# In what order we should try servers when a player logs in or is kicked from a server.
 	try = ["mc-survival"]
 
