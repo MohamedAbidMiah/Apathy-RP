@@ -46,6 +46,16 @@ x-modrinth-projects: &modrinth-projects "paper:luckperms,\
   paper:axiom-paper-plugin,\
   paper:viabackwards"
 
+x-survival-3-modrinth-projects: &survival-3-modrinth-projects "paper:luckperms,\
+  paper:simple-voice-chat,\
+  paper:chunky,paper:worldedit,\
+  paper:worldguard,\
+  paper:tab-bridge,\
+  paper:viewdistancetweaks,\
+  paper:skinsrestorer,\
+  paper:axiom-paper-plugin,\
+  paper:viabackwards"
+
 x-spiget-resources: &spiget-resources "34315,\
   19254,\
   69605,\
@@ -159,7 +169,7 @@ services:
       MEMORY: "4G"
       USE_AIKAR_FLAGS: "TRUE"
       ONLINE_MODE: "FALSE"
-      MODRINTH_PROJECTS: *modrinth-projects
+      MODRINTH_PROJECTS: *survival-3-modrinth-projects
       PLUGINS: *survival-3-plugins
       SPIGET_RESOURCES: *spiget-resources
       <<: [*luckperms-env, *coreprotect-env]
