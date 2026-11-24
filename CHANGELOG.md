@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.7.0](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.6.1...v1.7.0) (2026-11-24)
+
+
+### Features
+
+* new server on 26.3 ([a9d84d9](https://github.com/MohamedAbidMiah/Apathy-RP/commit/a9d84d97f97daba92c1738688dd61af236dbc9f5))
+
+
+### Bug Fixes
+
+* have unt plugin point to correct github repos ([73b21ea](https://github.com/MohamedAbidMiah/Apathy-RP/commit/73b21eacf8bf6e4632060cb6af3d42d398e1842d))
+* remove core protect in 26.3 ([6d83a7c](https://github.com/MohamedAbidMiah/Apathy-RP/commit/6d83a7c0c8929f07857231bf3ef3f169d6400e48))
+
 ## [1.6.1](https://github.com/MohamedAbidMiah/Apathy-RP/compare/v1.6.0...v1.6.1) (2026-11-08)
 
 
